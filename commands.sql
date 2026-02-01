@@ -1,6 +1,6 @@
 -- Create a new table 'blogs' with a primary key and columns
 CREATE TABLE blogs (
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY UNIQUE,
     author TEXT,
     url TEXT NOT NULL,
     title TEXT NOT NULL,
@@ -15,3 +15,5 @@ INSERT INTO blogs (author, url, title)
 VALUES ('CM Punk', 'https://www.youtube.com/watch?v=DMdqsS0a9tY', 'This Fire Burns');
 
 SELECT * FROM blogs;
+
+DROP TABLE blogs;
