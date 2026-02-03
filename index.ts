@@ -1,49 +1,12 @@
 import express from 'express';
-import { DataTypes, Model } from 'sequelize';
 import * as z from 'zod';
 import type { Request, Response, NextFunction } from 'express';
-import { NewBlogSchema } from './src/utils/utils.js';
-import type { NewBlog } from './src/types/types.js';
-import { sequelize } from './src/utils/db.js';
-
-class Blog extends Model {
-	declare id: number;
-	declare author?: string;
-	declare url: string;
-	declare title: string;
-	declare likes?: number;
-}
-
-Blog.init(
-	{
-		id: {
-			type: DataTypes.INTEGER,
-			autoIncrement: true,
-			primaryKey: true,
-			unique: true,
-		},
-		author: {
-			type: DataTypes.STRING,
-		},
-		url: {
-			type: DataTypes.STRING,
-			allowNull: false,
-		},
-		title: {
-			type: DataTypes.STRING,
-			allowNull: false,
-		},
-		likes: {
-			type: DataTypes.INTEGER,
-			defaultValue: 0,
-		},
-	},
-	{ sequelize, underscored: true, timestamps: false, modelName: 'blog' },
-);
-
-Blog.sync();
+import blogRouter from './src/controllers/blogs.js';
+import config from './src/utils/config.js';
+import { connectToDatabase } from './src/utils/db.js';
 
 const app = express();
+const { PORT } = config;
 
 app.use(express.json());
 
@@ -57,42 +20,15 @@ const errorMiddleware = (error: unknown, _req: Request, res: Response, next: Nex
 	}
 };
 
-app.get('/api/blogs', async (_req: Request, res: Response) => {
-	const blogs: Blog[] = await Blog.findAll();
-
-	res.json(blogs);
-});
-
-app.post('/api/blogs', async (req: Request<unknown, unknown, NewBlog>, res: Response) => {
-	const parsedBody = NewBlogSchema.parse(req.body);
-	const addedBlog = await Blog.create(parsedBody);
-	res.status(201).json(addedBlog);
-});
-
-app.delete('/api/blogs/:id', async (req, res) => {
-	const parsedId = z.string().parse(req.params.id);
-
-	const blogToDelete = await Blog.findByPk(parsedId);
-
-	if (!blogToDelete) {
-		throw new Error('Invalid blog');
-	}
-
-	await Blog.destroy({
-		where: {
-			id: blogToDelete.id,
-		},
-	});
-
-	res.status(204).end();
-});
+app.use('/api/blogs', blogRouter);
 
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT ?? 3003;
+const start = async () => {
+	await connectToDatabase();
+	app.listen(PORT, async () => {
+		console.log(`Server running on port ${PORT}`);
+	});
+};
 
-app.listen(PORT, () => {
-	console.log(`Server connected on port ${PORT}`);
-});
-
-// TODO: Break the app into smaller chunks and import
+start();

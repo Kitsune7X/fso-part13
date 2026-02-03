@@ -7,3 +7,12 @@ Content-Type: application/json
   "url": "http://www.someauthor.com",
   "title": "Some blog"
 }
+
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "author": "Some author",
+  "title": "Some blog"
+}

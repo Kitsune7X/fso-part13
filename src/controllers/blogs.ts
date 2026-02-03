@@ -14,21 +14,57 @@ const blogFinder = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 router.get('/', async (_req: Request, res: Response) => {
-	const blogs: Blog[] = await Blog.findAll();
-
-	res.status(200).json(blogs);
-});
-
-router.post('/', async (req: Request<unknown, unknown, NewBlog>, res: Response) => {
-	const parsedBody = NewBlogSchema.parse(req.body);
-	const addedBlog = await Blog.create(parsedBody);
-	res.status(201).json(addedBlog);
-});
-
-router.delete('/:id', blogFinder, async (_req, res) => {
-	const blog = res.locals.blog;
-	if (blog) {
-		await blog.destroy();
+	const blogs: Blog[] | null = await Blog.findAll();
+	if (blogs) {
+		return res.status(200).json(blogs);
 	}
-	res.status(204).end();
+	return res.status(404).end();
 });
+
+router.get('/:id', blogFinder, async (_req: Request, res: Response) => {
+	const blog: Blog | null = res.locals.blog;
+
+	if (blog) {
+		return res.status(200).json(blog);
+	}
+	return res.status(404).end();
+});
+
+router.post('/', async (req: Request<unknown, unknown, NewBlog>, res: Response, next: NextFunction) => {
+	try {
+		const parsedBody = NewBlogSchema.parse(req.body);
+		const addedBlog = await Blog.create(parsedBody);
+		return res.status(201).json(addedBlog);
+	} catch (error) {
+		return next(error);
+	}
+});
+
+router.delete('/:id', blogFinder, async (_req: Request, res: Response, next: NextFunction) => {
+	try {
+		const blog: Blog | null = res.locals.blog;
+		if (blog) {
+			await blog.destroy();
+			return res.status(204).end();
+		}
+		return res.status(404).end();
+	} catch (error) {
+		return next(error);
+	}
+});
+
+router.patch('/:id', blogFinder, async (_req: Request, res: Response, next: NextFunction) => {
+	try {
+		const blog: Blog = res.locals.blog;
+		if (blog) {
+			blog.likes = blog.likes ? blog.likes + 1 : 1;
+			await blog.save();
+			return res.status(200).json(blog);
+		}
+		return res.status(404).end();
+	} catch (error) {
+		return next(error);
+	}
+});
+
+export default router;
