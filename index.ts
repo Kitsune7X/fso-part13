@@ -1,20 +1,10 @@
 import express from 'express';
-import dotenv from 'dotenv';
-import { DataTypes, Model, Sequelize } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import * as z from 'zod';
 import type { Request, Response, NextFunction } from 'express';
 import { NewBlogSchema } from './src/utils/utils.js';
 import type { NewBlog } from './src/types/types.js';
-
-dotenv.config();
-
-const databaseUrlParseResult = z.string().safeParse(process.env.DATABASE_URL);
-
-if (!databaseUrlParseResult.success) {
-	throw new Error('Incorrect DATABASE_URL');
-}
-
-const sequelize = new Sequelize(databaseUrlParseResult.data);
+import { sequelize } from './src/utils/db.js';
 
 class Blog extends Model {
 	declare id: number;

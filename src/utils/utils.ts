@@ -7,7 +7,7 @@ export const NewBlogSchema = z.object({
 	likes: z.number().optional(),
 });
 
-export const parseString = (str: string | undefined) => {
+export const parseString = (str: string | string[] | undefined) => {
 	const result = z.string().safeParse(str);
 
 	if (!result.success) {
