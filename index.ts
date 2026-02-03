@@ -4,7 +4,7 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 import * as z from 'zod';
 import type { Request, Response, NextFunction } from 'express';
 import { NewBlogSchema } from './src/utils/utils.js';
-import type { NewBlog } from './src/types.js';
+import type { NewBlog } from './src/types/types.js';
 
 dotenv.config();
 
@@ -57,7 +57,7 @@ const app = express();
 
 app.use(express.json());
 
-const errorMiddleware = (error: unknown, req: Request, res: Response, next: NextFunction) => {
+const errorMiddleware = (error: unknown, _req: Request, res: Response, next: NextFunction) => {
 	if (error instanceof z.ZodError) {
 		res.status(400).json({ error: error.issues });
 	} else if (error instanceof Error) {
@@ -74,47 +74,27 @@ app.get('/api/blogs', async (_req: Request, res: Response) => {
 });
 
 app.post('/api/blogs', async (req: Request<unknown, unknown, NewBlog>, res: Response) => {
-	try {
-		const parsedBody = NewBlogSchema.parse(req.body);
-		const addedBlog = await Blog.create(parsedBody);
-		res.status(201).json(addedBlog);
-	} catch (error: unknown) {
-		if (error instanceof z.ZodError) {
-			console.error(error.issues);
-			res.status(400).json({ error: error.issues });
-		} else if (error instanceof Error) {
-			console.log(error.message);
-			res.status(500).json({ error: `Server error: ${error.message}` });
-		} else {
-			console.log(error);
-			res.status(500).json({ error: 'Unknown error happened' });
-		}
-	}
+	const parsedBody = NewBlogSchema.parse(req.body);
+	const addedBlog = await Blog.create(parsedBody);
+	res.status(201).json(addedBlog);
 });
 
 app.delete('/api/blogs/:id', async (req, res) => {
-	try {
-		const parsedId = z.string().parse(req.params.id);
+	const parsedId = z.string().parse(req.params.id);
 
-		const blogToDelete = await Blog.findByPk(parsedId);
+	const blogToDelete = await Blog.findByPk(parsedId);
 
-		if (!blogToDelete) {
-			throw new Error('Invalid blog');
-		}
-
-		await Blog.destroy({
-			where: {
-				id: blogToDelete.id,
-			},
-		});
-
-		res.status(204).end();
-	} catch (error: unknown) {
-		if (error instanceof z.ZodError) {
-			console.log(error.issues);
-			res.status(400).json({ error: 'Invalid id' });
-		}
+	if (!blogToDelete) {
+		throw new Error('Invalid blog');
 	}
+
+	await Blog.destroy({
+		where: {
+			id: blogToDelete.id,
+		},
+	});
+
+	res.status(204).end();
 });
 
 app.use(errorMiddleware);
@@ -124,3 +104,5 @@ const PORT = process.env.PORT ?? 3003;
 app.listen(PORT, () => {
 	console.log(`Server connected on port ${PORT}`);
 });
+
+// TODO: Break the app into smaller chunks and import
