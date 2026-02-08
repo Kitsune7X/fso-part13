@@ -12,13 +12,13 @@ const { PORT } = config;
 app.use(express.json());
 
 const errorMiddleware = (error: unknown, _req: Request, res: Response, next: NextFunction) => {
-	if (error instanceof z.ZodError) {
-		res.status(400).json({ error: error.issues });
-	} else if (error instanceof Error) {
-		res.status(500).json({ error: error.message });
-	} else {
-		next(error);
-	}
+  if (error instanceof z.ZodError) {
+    res.status(400).json({ error: error.issues });
+  } else if (error instanceof Error) {
+    res.status(500).json({ error: error.message });
+  } else {
+    next(error);
+  }
 };
 
 app.use('/api/blogs', blogRouter);
@@ -27,10 +27,10 @@ app.use('/api/users', userRouter);
 app.use(errorMiddleware);
 
 const start = async () => {
-	await connectToDatabase();
-	app.listen(PORT, () => {
-		console.log(`Server running on port ${PORT}`);
-	});
+  await connectToDatabase();
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 };
 
 void start();

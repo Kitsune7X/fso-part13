@@ -11,5 +11,5 @@ export type ResponseUser = Partial<User>;
 export type NewUsername = Pick<NewUser, 'username'>;
 
 export interface UserParams {
-	username: string;
+  username: string;
 }

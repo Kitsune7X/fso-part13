@@ -1,23 +1,23 @@
 import * as z from 'zod';
 
 export const NewBlogSchema = z.object({
-	author: z.string().optional(),
-	title: z.string(),
-	url: z.string(),
-	likes: z.number().optional(),
+  author: z.string().optional(),
+  title: z.string(),
+  url: z.string(),
+  likes: z.number().optional(),
 });
 
 export const NewUserSchema = z.object({
-	username: z.string().min(3),
-	name: z.string(),
-	password: z.string().min(7),
+  username: z.string().min(3),
+  name: z.string(),
+  password: z.string().min(7),
 });
 
 export const parseString = (str: string | string[] | undefined) => {
-	const result = z.string().safeParse(str);
+  const result = z.string().safeParse(str);
 
-	if (!result.success) {
-		throw new Error(result.error.message);
-	}
-	return result.data;
+  if (!result.success) {
+    throw new Error(result.error.message);
+  }
+  return result.data;
 };
