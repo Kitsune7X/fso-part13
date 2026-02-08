@@ -1,0 +1,23 @@
+meta {
+  name: add_blog
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3003/api/blogs
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "author": "Some random author",
+    "url": "https://somerandomurl.com",
+    "title": "Some random title"
+  }
+}

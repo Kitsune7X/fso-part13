@@ -55,7 +55,7 @@ router.delete('/:id', blogFinder, async (_req: Request, res: Response, next: Nex
 
 router.patch('/:id', blogFinder, async (_req: Request, res: Response, next: NextFunction) => {
 	try {
-		const blog: Blog = res.locals.blog;
+		const blog: Blog | null = res.locals.blog;
 		if (blog) {
 			blog.likes = blog.likes ? blog.likes + 1 : 1;
 			await blog.save();
