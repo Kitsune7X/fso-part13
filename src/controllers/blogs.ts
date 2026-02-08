@@ -21,7 +21,7 @@ router.get('/', async (_req: Request, res: Response) => {
 	return res.status(404).end();
 });
 
-router.get('/:id', blogFinder, async (_req: Request, res: Response) => {
+router.get('/:id', blogFinder, (_req: Request, res: Response) => {
 	const blog: Blog | null = res.locals.blog;
 
 	if (blog) {
@@ -53,7 +53,7 @@ router.delete('/:id', blogFinder, async (_req: Request, res: Response, next: Nex
 	}
 });
 
-router.patch('/:id', blogFinder, async (_req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id', blogFinder, async (_req: Request, res: Response<Blog, Blog>, next: NextFunction) => {
 	try {
 		const blog: Blog | null = res.locals.blog;
 		if (blog) {

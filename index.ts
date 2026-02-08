@@ -26,9 +26,9 @@ app.use(errorMiddleware);
 
 const start = async () => {
 	await connectToDatabase();
-	app.listen(PORT, async () => {
+	app.listen(PORT, () => {
 		console.log(`Server running on port ${PORT}`);
 	});
 };
 
-start();
+void start();

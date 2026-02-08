@@ -5,6 +5,7 @@ class User extends Model {
 	declare id: number;
 	declare username: string;
 	declare name: string;
+	declare password: string;
 }
 
 User.init(
@@ -20,6 +21,10 @@ User.init(
 			allowNull: false,
 		},
 		name: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
+		passwordHash: {
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
