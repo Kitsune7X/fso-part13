@@ -6,7 +6,7 @@ import type { ResponseUser, NewUsername, UserParams } from '../types/types.js';
 import type { Request } from 'express';
 
 const router = express.Router();
-const { User } = models;
+const { User, Blog } = models;
 
 router.post('/', async (req, res, next) => {
   try {
@@ -26,7 +26,7 @@ router.post('/', async (req, res, next) => {
 });
 
 router.get('/', async (_req, res) => {
-  const users = await User.findAll({ attributes: { exclude: ['passwordHash'] } });
+  const users = await User.findAll({ attributes: { exclude: ['passwordHash'] }, include: Blog });
 
   if (users) {
     return res.status(200).json(users);

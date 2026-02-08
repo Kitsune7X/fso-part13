@@ -1,23 +1,18 @@
 meta {
-  name: create_user
+  name: login_user
   type: http
   seq: 1
 }
 
 post {
-  url: http://localhost:3003/api/users
+  url: http://localhost:3003/api/login
   body: json
   auth: none
-}
-
-headers {
-  Content-Type: application/json
 }
 
 body:json {
   {
     "username": "foxchan@pm.me",
-    "name": "FOX CHAN",
     "password": "1234567"
   }
 }
