@@ -8,7 +8,7 @@ export const NewBlogSchema = z.object({
 });
 
 export const NewUserSchema = z.object({
-  username: z.string().min(3),
+  username: z.email('Invalid Email address'),
   name: z.string(),
   password: z.string().min(7),
 });

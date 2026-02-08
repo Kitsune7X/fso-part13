@@ -1,0 +1,23 @@
+meta {
+  name: create_invalid_user
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3003/api/users
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "username": "invalidemai",
+    "name": "foxkun",
+    "password": "1234567"
+  }
+}
