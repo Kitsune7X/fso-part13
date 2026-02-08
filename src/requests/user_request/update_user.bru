@@ -1,0 +1,17 @@
+meta {
+  name: update_user
+  type: http
+  seq: 1
+}
+
+patch {
+  url: http://localhost:3003/api/users/newfoxchan
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "newfoxchan2"
+  }
+}

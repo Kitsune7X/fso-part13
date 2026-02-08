@@ -5,7 +5,7 @@ class User extends Model {
 	declare id: number;
 	declare username: string;
 	declare name: string;
-	declare password: string;
+	declare passwordHash: string;
 }
 
 User.init(

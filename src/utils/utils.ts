@@ -7,6 +7,12 @@ export const NewBlogSchema = z.object({
 	likes: z.number().optional(),
 });
 
+export const NewUserSchema = z.object({
+	username: z.string().min(3),
+	name: z.string(),
+	password: z.string().min(7),
+});
+
 export const parseString = (str: string | string[] | undefined) => {
 	const result = z.string().safeParse(str);
 
