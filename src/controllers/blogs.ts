@@ -1,7 +1,7 @@
 import express from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import models from '../models/index.js';
-import type { NewBlog } from '../types/types.js';
+import type { NewBlog, ResponseBlog } from '../types/types.js';
 import { NewBlogSchema } from '../utils/utils.js';
 import { parseString } from '../utils/utils.js';
 import jwt from 'jsonwebtoken';
@@ -51,7 +51,9 @@ router.get('/:id', blogFinder, (_req: Request, res: Response) => {
   const blog = res.locals.blog;
 
   if (blog) {
-    return res.status(200).json(blog);
+    const blogJSON = blog.toJSON<ResponseBlog>();
+    delete blogJSON.userId;
+    return res.status(200).json(blogJSON);
   }
   return res.status(404).end();
 });
@@ -72,7 +74,7 @@ router.post('/', tokenExtractor, async (req: Request<unknown, unknown, NewBlog>,
   }
 });
 
-router.delete('/:id', blogFinder, tokenExtractor, async (_req: Request, res: Response, next: NextFunction) => {
+router.delete('/:id', tokenExtractor, blogFinder, async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const blog = res.locals.blog;
     const user = await User.findByPk(res.locals.decodedToken.id);
@@ -89,7 +91,7 @@ router.delete('/:id', blogFinder, tokenExtractor, async (_req: Request, res: Res
       await blog.destroy();
       return res.status(204).end();
     }
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(403).json({ error: 'Unauthorized' });
   } catch (error) {
     return next(error);
   }

@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import { NewBlogSchema, NewUserSchema } from '../utils/utils.js';
 import User from '../models/user.js';
+import Blog from '../models/blog.js';
 import type { JwtPayload } from 'jsonwebtoken';
 
 export type NewBlog = z.infer<typeof NewBlogSchema>;
@@ -22,3 +23,5 @@ export interface DecodedToken extends JwtPayload {
 export interface UserParams {
   username: string;
 }
+
+export type ResponseBlog = Partial<Blog>;
