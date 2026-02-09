@@ -16,7 +16,6 @@ const { SECRET } = config;
 const blogFinder = async (req: Request, res: Response, next: NextFunction) => {
   const parsedBlogId = parseString(req.params.id);
   res.locals.blog = await Blog.findByPk(parsedBlogId, {
-    attributes: { exclude: ['userId'] },
     include: { model: User, attributes: ['name'] },
   });
   next();
@@ -57,8 +56,6 @@ router.get('/:id', blogFinder, (_req: Request, res: Response) => {
   return res.status(404).end();
 });
 
-// TODO: Make blog creation only possible with an authorization token
-
 router.post('/', tokenExtractor, async (req: Request<unknown, unknown, NewBlog>, res: Response, next: NextFunction) => {
   try {
     const user = await User.findByPk(res.locals.decodedToken.id);
@@ -75,14 +72,24 @@ router.post('/', tokenExtractor, async (req: Request<unknown, unknown, NewBlog>,
   }
 });
 
-router.delete('/:id', blogFinder, async (_req: Request, res: Response, next: NextFunction) => {
+router.delete('/:id', blogFinder, tokenExtractor, async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const blog = res.locals.blog;
-    if (blog) {
+    const user = await User.findByPk(res.locals.decodedToken.id);
+
+    if (!blog) {
+      return res.status(404).json({ error: 'Blog not found' });
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (blog.userId === user.id) {
       await blog.destroy();
       return res.status(204).end();
     }
-    return res.status(404).end();
+    return res.status(401).json({ error: 'Unauthorized' });
   } catch (error) {
     return next(error);
   }
