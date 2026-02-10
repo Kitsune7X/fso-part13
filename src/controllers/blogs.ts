@@ -37,6 +37,7 @@ const tokenExtractor = (req: Request, res: Response, next: NextFunction) => {
   return next();
 };
 
+// TODO: Expand filter with [Op.or]
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const where: { title?: { [Op.iLike]: string } } = {};
