@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import config from '../utils/config.js';
 import * as z from 'zod';
 import type { DecodedToken } from '../types/types.js';
+import { Op } from 'sequelize';
 
 const router = express.Router();
 const { Blog, User } = models;
@@ -36,15 +37,26 @@ const tokenExtractor = (req: Request, res: Response, next: NextFunction) => {
   return next();
 };
 
-router.get('/', async (_req: Request, res: Response) => {
-  const blogs = await Blog.findAll({
-    attributes: { exclude: ['userId'] },
-    include: { model: User, attributes: ['name'] },
-  });
-  if (blogs) {
-    return res.status(200).json(blogs);
+router.get('/', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const where: { title?: { [Op.iLike]: string } } = {};
+
+    if (req.query.search) {
+      where.title = { [Op.iLike]: `%${z.string().parse(req.query.search)}%` };
+    }
+
+    const blogs = await Blog.findAll({
+      attributes: { exclude: ['userId'] },
+      include: { model: User, attributes: ['name'] },
+      where,
+    });
+    if (blogs) {
+      return res.status(200).json(blogs);
+    }
+    return res.status(404).end();
+  } catch (error) {
+    return next(error);
   }
-  return res.status(404).end();
 });
 
 router.get('/:id', blogFinder, (_req: Request, res: Response) => {
