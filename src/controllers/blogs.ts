@@ -37,14 +37,15 @@ const tokenExtractor = (req: Request, res: Response, next: NextFunction) => {
   return next();
 };
 
-// TODO: Expand filter with [Op.or]
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const where: { title?: { [Op.iLike]: string } } = {};
+    const parsedQuery = req.query.search ? z.string().parse(req.query.search) : undefined;
 
-    if (req.query.search) {
-      where.title = { [Op.iLike]: `%${z.string().parse(req.query.search)}%` };
-    }
+    const where = parsedQuery
+      ? {
+          [Op.or]: [{ title: { [Op.iLike]: `%${parsedQuery}%` } }, { author: { [Op.iLike]: `%${parsedQuery}%` } }],
+        }
+      : {};
 
     const blogs = await Blog.findAll({
       attributes: { exclude: ['userId'] },
