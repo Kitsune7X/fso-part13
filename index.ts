@@ -4,6 +4,7 @@ import type { Request, Response, NextFunction } from 'express';
 import blogRouter from './src/controllers/blogs.js';
 import userRouter from './src/controllers/users.js';
 import loginRouter from './src/controllers/login.js';
+import authorRouter from './src/controllers/authors.js';
 import config from './src/utils/config.js';
 import { connectToDatabase } from './src/utils/db.js';
 
@@ -22,9 +23,10 @@ const errorMiddleware = (error: unknown, _req: Request, res: Response, next: Nex
   }
 };
 
-app.use('/api/blogs', blogRouter);
 app.use('/api/users', userRouter);
 app.use('/api/login', loginRouter);
+app.use('/api/authors', authorRouter);
+app.use('/api/blogs', blogRouter);
 
 app.use(errorMiddleware);
 
