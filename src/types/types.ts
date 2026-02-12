@@ -3,6 +3,7 @@ import { NewBlogSchema, NewUserSchema } from '../utils/utils.js';
 import User from '../models/user.js';
 import Blog from '../models/blog.js';
 import type { JwtPayload } from 'jsonwebtoken';
+import { migrator } from '../utils/db.js';
 
 export type NewBlog = z.infer<typeof NewBlogSchema>;
 
@@ -25,3 +26,5 @@ export interface UserParams {
 }
 
 export type ResponseBlog = Partial<Blog>;
+
+export type Migration = typeof migrator._types.migration;

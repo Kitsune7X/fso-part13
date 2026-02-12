@@ -1,13 +1,26 @@
-// TODO: Write initialize Db module
 import { Sequelize } from 'sequelize';
 import config from './config.js';
 import { parseString } from './utils.js';
+import { Umzug, SequelizeStorage } from 'umzug';
+// Convert __dirname for ES Module
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const { DATABASE_URL } = config;
 
 const parsedDatabaseUrl = parseString(DATABASE_URL);
 
 export const sequelize = new Sequelize(parsedDatabaseUrl);
+
+export const migrator = new Umzug({
+  migrations: {
+    glob: ['../migrations/*.ts', { cwd: __dirname }],
+  },
+  storage: new SequelizeStorage({ sequelize, tableName: 'migrations' }),
+  context: sequelize.getQueryInterface(),
+  logger: console,
+});
 
 export const connectToDatabase = async () => {
   try {
