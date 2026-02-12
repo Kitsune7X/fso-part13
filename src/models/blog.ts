@@ -7,6 +7,7 @@ class Blog extends Model {
   declare url: string;
   declare title: string;
   declare likes?: number;
+  declare yearWritten: number;
   declare userId: number;
 }
 
@@ -32,6 +33,15 @@ Blog.init(
     likes: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    yearWritten: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        min: { args: [1991], msg: 'Year written need to be after 1991' },
+        max: { args: [new Date().getFullYear()], msg: 'Year written must not later than current year' },
+      },
+      defaultValue: new Date().getFullYear(),
     },
     userId: {
       type: DataTypes.INTEGER,

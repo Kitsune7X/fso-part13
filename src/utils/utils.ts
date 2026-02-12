@@ -5,6 +5,7 @@ export const NewBlogSchema = z.object({
   title: z.string(),
   url: z.string(),
   likes: z.number().optional(),
+  yearWritten: z.number(),
 });
 
 export const NewUserSchema = z.object({
