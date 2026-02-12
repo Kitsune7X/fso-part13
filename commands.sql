@@ -17,3 +17,9 @@ VALUES ('CM Punk', 'https://www.youtube.com/watch?v=DMdqsS0a9tY', 'This Fire Bur
 SELECT * FROM blogs;
 
 DROP TABLE blogs;
+
+DROP TABLE users;
+
+SELECT * FROM users;
+
+SELECT * FROM blogs;
