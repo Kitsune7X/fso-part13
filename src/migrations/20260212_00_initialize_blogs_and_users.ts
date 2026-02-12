@@ -53,6 +53,14 @@ export const up: Migration = async ({ context: queryInterface }) => {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   });
 
   await queryInterface.addColumn('blogs', 'user_id', {
@@ -63,6 +71,6 @@ export const up: Migration = async ({ context: queryInterface }) => {
 };
 
 export const down: Migration = async ({ context: queryInterface }) => {
-  await queryInterface.dropTable('users');
   await queryInterface.dropTable('blogs');
+  await queryInterface.dropTable('users');
 };

@@ -22,9 +22,22 @@ export const migrator = new Umzug({
   logger: console,
 });
 
+const runMigration = async () => {
+  const migration = await migrator.up();
+  console.log('Migration up to date', {
+    files: migration.map((mig) => mig.name),
+  });
+};
+
+export const rollbackMigration = async () => {
+  await sequelize.authenticate();
+  await migrator.down();
+};
+
 export const connectToDatabase = async () => {
   try {
     await sequelize.authenticate();
+    await runMigration();
     console.log('Connected to the Database');
   } catch (error) {
     console.error('Unable to connect to the database', error);
