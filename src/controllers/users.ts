@@ -28,7 +28,10 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (_req, res) => {
   const users = await User.findAll({
     attributes: { exclude: ['passwordHash'] },
-    include: [{ model: Blog, attributes: { exclude: ['userId'] } }],
+    include: [
+      { model: Blog, attributes: { exclude: ['userId'] } },
+      { model: Blog, as: 'readings', attributes: ['title', 'id'], through: { attributes: ['read'] } },
+    ],
   });
 
   if (users) {
@@ -36,6 +39,10 @@ router.get('/', async (_req, res) => {
   }
   return res.status(404).end();
 });
+
+// router.get('/:id', async (req, res) => {
+
+// })
 
 router.patch('/:username', async (req: Request<UserParams, unknown, NewUsername>, res, next) => {
   try {
