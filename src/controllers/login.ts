@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken';
 import * as z from 'zod';
 
 const router = express.Router();
-const { User } = models;
+const { User, Session } = models;
 const { SECRET } = config;
 
 // Typing the Session Data so that I can add custom properties
@@ -45,6 +45,11 @@ router.post('/', async (req: Request<unknown, unknown, LoginUser>, res, next) =>
 
     const token = jwt.sign(userForToken, z.string().parse(SECRET));
 
+    user.isLoggedIn = true;
+
+    await user.save();
+
+    await Session.create({ token, userId: user.id, isLoggedIn: true });
     // Save the token in cookie
     res.cookie('token', token, {
       httpOnly: true,
@@ -52,8 +57,8 @@ router.post('/', async (req: Request<unknown, unknown, LoginUser>, res, next) =>
       maxAge: 60 * 60 * 1000,
     });
 
-    req.session.user = Object.assign(userForToken, { token });
-    console.log(req.session);
+    req.session.user = Object.assign(userForToken, { token, isLoggedIn: true });
+    // console.log(req.session);
 
     req.session.save();
 

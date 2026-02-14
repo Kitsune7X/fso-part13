@@ -1,45 +1,41 @@
-import { sequelize } from '../utils/db.js';
 import { DataTypes, Model } from 'sequelize';
+import { sequelize } from '../utils/db.js';
 
-class User extends Model {
+class Session extends Model {
   declare id: number;
-  declare username: string;
-  declare name: string;
-  declare passwordHash: string;
+  declare userId: number;
+  declare token: string;
   declare isLoggedIn: boolean;
 }
 
-User.init(
+Session.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
-      unique: true,
       primaryKey: true,
-    },
-    username: {
-      type: DataTypes.STRING,
       allowNull: false,
     },
-    name: {
-      type: DataTypes.STRING,
+    userId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: { model: 'users', key: 'id' },
     },
-    passwordHash: {
-      type: DataTypes.STRING,
+    token: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     isLoggedIn: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false,
     },
   },
   {
     sequelize,
     underscored: true,
-    modelName: 'user',
+    timestamps: false,
+    modelName: 'session',
   },
 );
 
-export default User;
+export default Session;
