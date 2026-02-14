@@ -1,7 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import type { LoginUser } from '../types/types.js';
-import type { Request } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import models from '../models/index.js';
 import config from '../utils/config.js';
 import jwt from 'jsonwebtoken';
@@ -10,6 +10,23 @@ import * as z from 'zod';
 const router = express.Router();
 const { User } = models;
 const { SECRET } = config;
+
+// Typing the Session Data so that I can add custom properties
+declare module 'express-session' {
+  interface SessionData {
+    user: {
+      token: string;
+      username: string;
+      id: number;
+    };
+  }
+}
+
+// Middleware to test if authenticated
+const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+  if (req.session.user) next();
+  else res.status(401).json({ error: 'Unauthorized' });
+};
 
 router.post('/', async (req: Request<unknown, unknown, LoginUser>, res, next) => {
   try {
@@ -28,10 +45,26 @@ router.post('/', async (req: Request<unknown, unknown, LoginUser>, res, next) =>
 
     const token = jwt.sign(userForToken, z.string().parse(SECRET));
 
+    // Save the token in cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 60 * 60 * 1000,
+    });
+
+    req.session.user = Object.assign(userForToken, { token });
+    console.log(req.session);
+
+    req.session.save();
+
     return res.status(200).json({ token, username: user.username, name: user.name });
   } catch (error) {
     return next(error);
   }
+});
+
+router.get('/session', isAuthenticated, (_req, res) => {
+  res.send('Hello!!!!!!!!');
 });
 
 export default router;

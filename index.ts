@@ -8,9 +8,10 @@ import authorRouter from './src/controllers/authors.js';
 import readingRouter from './src/controllers/readinglists.js';
 import config from './src/utils/config.js';
 import { connectToDatabase } from './src/utils/db.js';
+import session from 'express-session';
 
 const app = express();
-const { PORT } = config;
+const { PORT, SESSION_SECRET } = config;
 
 app.use(express.json());
 
@@ -23,6 +24,17 @@ const errorMiddleware = (error: unknown, _req: Request, res: Response, next: Nex
     next(error);
   }
 };
+
+app.use(
+  session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      httpOnly: true,
+    },
+  }),
+);
 
 app.use('/api/users', userRouter);
 app.use('/api/login', loginRouter);
