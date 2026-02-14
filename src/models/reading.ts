@@ -1,13 +1,13 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../utils/db.js';
 
-class ReadingList extends Model {
+class Reading extends Model {
   declare id: number;
   declare userId: number;
   declare blogId: number;
 }
 
-ReadingList.init(
+Reading.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -25,13 +25,18 @@ ReadingList.init(
       allowNull: false,
       references: { model: 'blogs', key: 'id' },
     },
+    read: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
     underscored: true,
     timestamps: false,
-    modelName: 'reading_list',
+    modelName: 'reading',
   },
 );
 
-export default ReadingList;
+export default Reading;
