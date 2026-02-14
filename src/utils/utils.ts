@@ -22,3 +22,7 @@ export const parseString = (str: string | string[] | undefined) => {
   }
   return result.data;
 };
+
+export const ReadStatusSchema = z.object({
+  read: z.boolean(),
+});

@@ -5,6 +5,7 @@ class Reading extends Model {
   declare id: number;
   declare userId: number;
   declare blogId: number;
+  declare read: boolean;
 }
 
 Reading.init(
