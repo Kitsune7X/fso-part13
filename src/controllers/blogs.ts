@@ -5,7 +5,7 @@ import type { NewBlog, ResponseBlog } from '../types/types.js';
 import { NewBlogSchema } from '../utils/utils.js';
 import * as z from 'zod';
 import { Op } from 'sequelize';
-import { blogFinder, tokenExtractor } from '../utils/middleware.js';
+import { blogFinder, isAuthenticated, tokenExtractor } from '../utils/middleware.js';
 
 const router = express.Router();
 const { Blog, User } = models;
@@ -46,46 +46,57 @@ router.get('/:id', blogFinder, (_req: Request, res: Response) => {
   return res.status(404).end();
 });
 
-router.post('/', tokenExtractor, async (req: Request<unknown, unknown, NewBlog>, res: Response, next: NextFunction) => {
-  try {
-    const user = await User.findByPk(res.locals.decodedToken.id);
+router.post(
+  '/',
+  tokenExtractor,
+  isAuthenticated,
+  async (req: Request<unknown, unknown, NewBlog>, res: Response, next: NextFunction) => {
+    try {
+      const user = await User.findByPk(res.locals.decodedToken.id);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const parsedBody = NewBlogSchema.parse(req.body);
+      const addedBlog = await Blog.create({ ...parsedBody, userId: user.id });
+      return res.status(201).json(addedBlog);
+    } catch (error) {
+      return next(error);
     }
+  },
+);
 
-    const parsedBody = NewBlogSchema.parse(req.body);
-    const addedBlog = await Blog.create({ ...parsedBody, userId: user.id });
-    return res.status(201).json(addedBlog);
-  } catch (error) {
-    return next(error);
-  }
-});
+router.delete(
+  '/:id',
+  tokenExtractor,
+  isAuthenticated,
+  blogFinder,
+  async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const blog = res.locals.blog;
+      const user = await User.findByPk(res.locals.decodedToken.id);
 
-router.delete('/:id', tokenExtractor, blogFinder, async (_req: Request, res: Response, next: NextFunction) => {
-  try {
-    const blog = res.locals.blog;
-    const user = await User.findByPk(res.locals.decodedToken.id);
+      if (!blog) {
+        return res.status(404).json({ error: 'Blog not found' });
+      }
 
-    if (!blog) {
-      return res.status(404).json({ error: 'Blog not found' });
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      if (blog.userId === user.id) {
+        await blog.destroy();
+        return res.status(204).end();
+      }
+      return res.status(403).json({ error: 'Unauthorized' });
+    } catch (error) {
+      return next(error);
     }
+  },
+);
 
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    if (blog.userId === user.id) {
-      await blog.destroy();
-      return res.status(204).end();
-    }
-    return res.status(403).json({ error: 'Unauthorized' });
-  } catch (error) {
-    return next(error);
-  }
-});
-
-router.patch('/:id', blogFinder, async (_req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id', blogFinder, isAuthenticated, async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const blog = res.locals.blog;
     if (blog) {

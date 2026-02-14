@@ -6,6 +6,7 @@ import models from '../models/index.js';
 import config from '../utils/config.js';
 import jwt from 'jsonwebtoken';
 import * as z from 'zod';
+import { isAuthenticated } from '../utils/middleware.js';
 
 const router = express.Router();
 const { User, Session } = models;
@@ -22,13 +23,7 @@ declare module 'express-session' {
   }
 }
 
-// Middleware to test if authenticated
-const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  if (req.session.user) next();
-  else res.status(401).json({ error: 'Unauthorized' });
-};
-
-router.post('/', async (req: Request<unknown, unknown, LoginUser>, res, next) => {
+router.post('/', async (req: Request<unknown, unknown, LoginUser>, res: Response, next: NextFunction) => {
   try {
     const user = await User.findOne({ where: { username: req.body.username } });
 
@@ -50,7 +45,7 @@ router.post('/', async (req: Request<unknown, unknown, LoginUser>, res, next) =>
     await user.save();
 
     await Session.create({ token, userId: user.id, isLoggedIn: true });
-    // Save the token in cookie
+
     res.cookie('token', token, {
       httpOnly: true,
       secure: true,

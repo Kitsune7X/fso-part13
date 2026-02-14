@@ -1,7 +1,7 @@
 import express from 'express';
 import models from '../models/index.js';
 import type { Request, Response, NextFunction } from 'express';
-import { tokenExtractor } from '../utils/middleware.js';
+import { isAuthenticated, tokenExtractor } from '../utils/middleware.js';
 import { parseString, ReadStatusSchema } from '../utils/utils.js';
 
 const router = express.Router();
@@ -27,7 +27,7 @@ router.post(
   },
 );
 
-router.patch('/:id', tokenExtractor, async (req, res, next) => {
+router.patch('/:id', tokenExtractor, isAuthenticated, async (req, res, next) => {
   try {
     const parsedId = parseString(req.params.id);
     const user = await User.findByPk(res.locals.decodedToken.id);
