@@ -26,7 +26,10 @@ router.post('/', async (req, res, next) => {
 });
 
 router.get('/', async (_req, res) => {
-  const users = await User.findAll({ attributes: { exclude: ['passwordHash'] }, include: Blog });
+  const users = await User.findAll({
+    attributes: { exclude: ['passwordHash'] },
+    include: [{ model: Blog, attributes: { exclude: ['userId'] } }],
+  });
 
   if (users) {
     return res.status(200).json(users);
