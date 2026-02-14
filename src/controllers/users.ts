@@ -2,7 +2,7 @@ import express from 'express';
 import models from '../models/index.js';
 import bcrypt from 'bcrypt';
 import { NewUserSchema } from '../utils/utils.js';
-import type { ResponseUser, NewUsername, UserParams } from '../types/types.js';
+import type { ResponseUser, NewUsername, UsernameParams, UserIdParams } from '../types/types.js';
 import type { Request } from 'express';
 
 const router = express.Router();
@@ -40,11 +40,31 @@ router.get('/', async (_req, res) => {
   return res.status(404).end();
 });
 
-// router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request<UserIdParams>, res, next) => {
+  try {
+    const user = await User.findByPk(req.params.id, {
+      attributes: { exclude: ['passwordHash'] },
+      include: [
+        { model: Blog, attributes: { exclude: ['userId'] } },
+        {
+          model: Blog,
+          as: 'readings',
+          attributes: { exclude: ['createdAt', 'updatedAt', 'userId'] },
+          through: { attributes: ['id', 'read'] },
+        },
+      ],
+    });
 
-// })
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    return res.status(200).json(user);
+  } catch (error) {
+    return next(error);
+  }
+});
 
-router.patch('/:username', async (req: Request<UserParams, unknown, NewUsername>, res, next) => {
+router.patch('/:username', async (req: Request<UsernameParams, unknown, NewUsername>, res, next) => {
   try {
     const user = await User.findOne({
       where: { username: req.params.username },

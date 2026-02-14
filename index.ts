@@ -5,6 +5,7 @@ import blogRouter from './src/controllers/blogs.js';
 import userRouter from './src/controllers/users.js';
 import loginRouter from './src/controllers/login.js';
 import authorRouter from './src/controllers/authors.js';
+import readingRouter from './src/controllers/readinglists.js';
 import config from './src/utils/config.js';
 import { connectToDatabase } from './src/utils/db.js';
 
@@ -27,6 +28,7 @@ app.use('/api/users', userRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/authors', authorRouter);
 app.use('/api/blogs', blogRouter);
+app.use('/api/readinglists', readingRouter);
 
 app.use(errorMiddleware);
 

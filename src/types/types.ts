@@ -21,7 +21,10 @@ export interface DecodedToken extends JwtPayload {
   username: string;
 }
 
-export interface UserParams {
+export interface UserIdParams {
+  id: number;
+}
+export interface UsernameParams {
   username: string;
 }
 
