@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import type { Migration } from '../types/types.js';
 
 export const up: Migration = async ({ context: queryInterface }) => {
-  await queryInterface.createTable('readings', {
+  await queryInterface.createTable('readinglists', {
     id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -28,5 +28,5 @@ export const up: Migration = async ({ context: queryInterface }) => {
 };
 
 export const down: Migration = async ({ context: queryInterface }) => {
-  await queryInterface.dropTable('readings');
+  await queryInterface.dropTable('readinglists');
 };
