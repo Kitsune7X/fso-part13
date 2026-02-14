@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { NewUserSchema } from '../utils/utils.js';
 import type { ResponseUser, NewUsername, UsernameParams, UserIdParams } from '../types/types.js';
 import type { Request } from 'express';
+import * as z from 'zod';
 
 const router = express.Router();
 const { User, Blog } = models;
@@ -42,6 +43,10 @@ router.get('/', async (_req, res) => {
 
 router.get('/:id', async (req: Request<UserIdParams>, res, next) => {
   try {
+    const parsedQuery = req.query.read ? z.string().parse(req.query.read) : undefined;
+
+    const where = parsedQuery === 'true' ? { read: true } : parsedQuery === 'false' ? { read: false } : {};
+
     const user = await User.findByPk(req.params.id, {
       attributes: { exclude: ['passwordHash'] },
       include: [
@@ -50,7 +55,7 @@ router.get('/:id', async (req: Request<UserIdParams>, res, next) => {
           model: Blog,
           as: 'readings',
           attributes: { exclude: ['createdAt', 'updatedAt', 'userId'] },
-          through: { attributes: ['id', 'read'] },
+          through: { attributes: ['id', 'read'], where },
         },
       ],
     });
