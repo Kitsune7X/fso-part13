@@ -1,4 +1,3 @@
-// TODO: Initialize a table that store the session
 import { DataTypes } from 'sequelize';
 import type { Migration } from '../types/types.js';
 

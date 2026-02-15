@@ -25,7 +25,7 @@ const errorMiddleware = (error: unknown, _req: Request, res: Response, next: Nex
     next(error);
   }
 };
-// TODO: Store session on the database
+
 app.use(
   session({
     secret: SESSION_SECRET,
