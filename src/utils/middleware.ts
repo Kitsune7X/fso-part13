@@ -39,16 +39,22 @@ export const tokenExtractor = (req: Request, res: Response, next: NextFunction) 
 };
 
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
+  // const user = await User.findByPk(res.locals.decodedToken.id);
+
+  // if (!user?.isLoggedIn) return res.status(401).json({ error: 'Unauthorized' });
+
   // Get extract user from token and make sure that expired token cannot be used to authenticate
   const authorization = req.get('authorization');
 
   if (authorization?.toLowerCase().startsWith('bearer') && req.session.user) {
     try {
       const token = z.string().parse(authorization.substring(TOKEN_START));
+      console.log(token);
       const userId = req.session.user.id;
+      console.log(userId);
 
       const activeSession = await Session.findOne({
-        where: { [Op.and]: [{ userId, token }] },
+        where: { [Op.and]: [{ userId }, { token }] },
       });
 
       if (!activeSession?.isLoggedIn) res.status(401).json({ error: 'Unauthorized' });

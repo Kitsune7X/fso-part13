@@ -1,0 +1,1 @@
+{"version":3,"file":"reading.d.ts","sourceRoot":"","sources":["../../../src/models/reading.ts"],"names":[],"mappings":"AAAA,OAAO,EAAa,KAAK,EAAE,MAAM,WAAW,CAAC;AAG7C,cAAM,OAAQ,SAAQ,KAAK;IACjB,EAAE,EAAE,MAAM,CAAC;IACX,MAAM,EAAE,MAAM,CAAC;IACf,MAAM,EAAE,MAAM,CAAC;IACf,IAAI,EAAE,OAAO,CAAC;CACvB;AAkCD,eAAe,OAAO,CAAC"}
